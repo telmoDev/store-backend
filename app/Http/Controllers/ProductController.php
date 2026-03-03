@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProductRequest;
@@ -39,7 +40,7 @@ class ProductController extends Controller
             }
         }
 
-        return $query->paginate($request->input('per_page', 10));
+        return ProductResource::collection($query->paginate($request->input('per_page', 10)));
     }
 
     /**
@@ -55,9 +56,8 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        //
         $product = Product::create($request->all());
-        
+        return new ProductResource($product);
     }
 
     /**
@@ -65,7 +65,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return $product;
+        return new ProductResource($product);
     }
 
     /**
@@ -73,7 +73,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        return $product;
+        return new ProductResource($product);
     }
 
     /**
@@ -82,7 +82,7 @@ class ProductController extends Controller
     public function update(ProductRequest $request, Product $product)
     {
         $product->update($request->all());
-        return $product;
+        return new ProductResource($product);
     }
 
     /**
@@ -91,6 +91,8 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        return $product;
+        return response()->json([
+            'message' => 'Producto eliminado correctamente',
+        ]);
     }
 }
