@@ -72,7 +72,7 @@ return new class extends Migration
                 OUT p_order_id INT,
                 OUT p_error_message VARCHAR(255)
             )
-            BEGIN
+            sp_create_order: BEGIN
                 DECLARE v_item_count INT;
                 DECLARE v_idx INT DEFAULT 0;
                 DECLARE v_product_id INT;
