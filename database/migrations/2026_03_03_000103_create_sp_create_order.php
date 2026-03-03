@@ -10,57 +10,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. Procedure for Products with Search, Sort and Pagination
-        DB::unprepared("DROP PROCEDURE IF EXISTS sp_get_products;");
-        DB::unprepared("
-            CREATE PROCEDURE sp_get_products(
-                IN p_search VARCHAR(255),
-                IN p_sort_field VARCHAR(50),
-                IN p_sort_dir VARCHAR(4),
-                IN p_limit INT,
-                IN p_offset INT
-            )
-            BEGIN
-                SET @query = 'SELECT * FROM products WHERE 1=1';
-                
-                IF p_search IS NOT NULL AND p_search != '' THEN
-                    SET @query = CONCAT(@query, ' AND (name LIKE ''%', p_search, '%'' OR sku LIKE ''%', p_search, '%'' )');
-                END IF;
-
-                IF p_sort_field IS NOT NULL AND p_sort_field != '' THEN
-                    SET @query = CONCAT(@query, ' ORDER BY ', p_sort_field, ' ', p_sort_dir);
-                ELSE
-                    SET @query = CONCAT(@query, ' ORDER BY id ASC');
-                END IF;
-
-                SET @query = CONCAT(@query, ' LIMIT ', p_limit, ' OFFSET ', p_offset);
-
-                PREPARE stmt FROM @query;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
-            END
-        ");
-
-        // Procedure to get total count with search
-        DB::unprepared("DROP PROCEDURE IF EXISTS sp_get_products_count;");
-        DB::unprepared("
-            CREATE PROCEDURE sp_get_products_count(
-                IN p_search VARCHAR(255)
-            )
-            BEGIN
-                SET @query = 'SELECT COUNT(*) as total FROM products WHERE 1=1';
-                
-                IF p_search IS NOT NULL AND p_search != '' THEN
-                    SET @query = CONCAT(@query, ' AND (name LIKE ''%', p_search, '%'' OR sku LIKE ''%', p_search, '%'' )');
-                END IF;
-
-                PREPARE stmt FROM @query;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
-            END
-        ");
-
-        // 2. Procedure for Creating Orders (Transactional)
         DB::unprepared("DROP PROCEDURE IF EXISTS sp_create_order;");
         DB::unprepared("
             CREATE PROCEDURE sp_create_order(
@@ -150,37 +99,6 @@ return new class extends Migration
                 END IF;
             END
         ");
-
-        // Procedure for listing orders
-        DB::unprepared("DROP PROCEDURE IF EXISTS sp_get_orders;");
-        DB::unprepared("
-            CREATE PROCEDURE sp_get_orders(
-                IN p_desde DATE,
-                IN p_hasta DATE,
-                IN p_min_total DECIMAL(10,2)
-            )
-            BEGIN
-                SET @query = 'SELECT * FROM orders WHERE 1=1';
-                
-                IF p_desde IS NOT NULL THEN
-                    SET @query = CONCAT(@query, ' AND created_at >= ''', p_desde, ' 00:00:00''');
-                END IF;
-
-                IF p_hasta IS NOT NULL THEN
-                    SET @query = CONCAT(@query, ' AND created_at <= ''', p_hasta, ' 23:59:59''');
-                END IF;
-
-                IF p_min_total IS NOT NULL THEN
-                    SET @query = CONCAT(@query, ' AND total_amount >= ', p_min_total);
-                END IF;
-
-                SET @query = CONCAT(@query, ' ORDER BY created_at DESC');
-
-                PREPARE stmt FROM @query;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
-            END
-        ");
     }
 
     /**
@@ -188,7 +106,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS sp_get_products;");
         DB::unprepared("DROP PROCEDURE IF EXISTS sp_create_order;");
     }
 };
