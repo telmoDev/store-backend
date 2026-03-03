@@ -1,5 +1,9 @@
 @baseUrl = http://localhost/api
 
+### Listar Productos
+GET {{baseUrl}}/productos
+Accept: application/json
+
 ### Listar Productos (Paginado y Búsqueda)
 GET {{baseUrl}}/productos?search=Laptop&page=1&per_page=5
 Accept: application/json
