@@ -4,43 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProductRequest;
 
 class ProductController extends Controller
 {
+    protected $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Product::query();
-
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('sort')) {
-            $sortField = $request->input('sort');
-            $direction = 'asc';
-
-            if (str_starts_with($sortField, '-')) {
-                $direction = 'desc';
-                $sortField = substr($sortField, 1);
-            }
-
-            // Optional: Validate sort field to prevent SQL injection or errors
-            $allowedSorts = ['name', 'price', 'stock', 'sku', 'created_at'];
-            if (in_array($sortField, $allowedSorts)) {
-                $query->orderBy($sortField, $direction);
-            }
-        }
-
-        return ProductResource::collection($query->paginate($request->input('per_page', 10)));
+        $products = $this->productService->listProducts($request->all());
+        return ProductResource::collection($products);
     }
 
     /**
