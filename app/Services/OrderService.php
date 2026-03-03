@@ -8,9 +8,13 @@ use Exception;
 
 class OrderService
 {
-    public function listOrders()
+    public function listOrders(array $filters = [])
     {
-        $results = DB::select("CALL sp_get_orders()");
+        $desde = $filters['desde'] ?? null;
+        $hasta = $filters['hasta'] ?? null;
+        $minTotal = $filters['minTotal'] ?? null;
+
+        $results = DB::select("CALL sp_get_orders(?, ?, ?)", [$desde, $hasta, $minTotal]);
         return Order::hydrate($results);
     }
 

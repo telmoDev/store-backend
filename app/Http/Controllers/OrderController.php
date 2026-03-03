@@ -21,9 +21,10 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = $this->orderService->listOrders();
+        $filters = $request->only(['desde', 'hasta', 'minTotal']);
+        $orders = $this->orderService->listOrders($filters);
         return OrderResource::collection($orders->load('details.product'));
     }
 
