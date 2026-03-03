@@ -20,7 +20,7 @@ class OrderResource extends JsonResource
             'customer_email' => $this->customer_email,
             'customer_phone' => $this->customer_phone,
             'customer_address' => $this->customer_address,
-            'products' => OrderDetailResource::collection($this->whenLoaded('products')),
+            'products' => OrderDetailResource::collection($this->whenLoaded('details')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

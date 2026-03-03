@@ -19,23 +19,46 @@ return new class extends Migration
             )
             BEGIN
                 SET @query = 'SELECT * FROM orders WHERE 1=1';
+                SET @desde = p_desde;
+                SET @hasta = p_hasta;
+                SET @min_total = p_min_total;
                 
                 IF p_desde IS NOT NULL THEN
-                    SET @query = CONCAT(@query, ' AND created_at >= ''', p_desde, ' 00:00:00''');
+                    SET @query = CONCAT(@query, ' AND created_at >= ?');
+                    SET @desde = CONCAT(p_desde, ' 00:00:00');
                 END IF;
 
                 IF p_hasta IS NOT NULL THEN
-                    SET @query = CONCAT(@query, ' AND created_at <= ''', p_hasta, ' 23:59:59''');
+                    SET @query = CONCAT(@query, ' AND created_at <= ?');
+                    SET @hasta = CONCAT(p_hasta, ' 23:59:59');
                 END IF;
 
                 IF p_min_total IS NOT NULL THEN
-                    SET @query = CONCAT(@query, ' AND total_amount >= ', p_min_total);
+                    SET @query = CONCAT(@query, ' AND total_amount >= ?');
                 END IF;
 
                 SET @query = CONCAT(@query, ' ORDER BY created_at DESC');
 
                 PREPARE stmt FROM @query;
-                EXECUTE stmt;
+                
+                IF p_desde IS NOT NULL AND p_hasta IS NOT NULL AND p_min_total IS NOT NULL THEN
+                    EXECUTE stmt USING @desde, @hasta, @min_total;
+                ELSEIF p_desde IS NOT NULL AND p_hasta IS NOT NULL THEN
+                    EXECUTE stmt USING @desde, @hasta;
+                ELSEIF p_desde IS NOT NULL AND p_min_total IS NOT NULL THEN
+                    EXECUTE stmt USING @desde, @min_total;
+                ELSEIF p_hasta IS NOT NULL AND p_min_total IS NOT NULL THEN
+                    EXECUTE stmt USING @hasta, @min_total;
+                ELSEIF p_desde IS NOT NULL THEN
+                    EXECUTE stmt USING @desde;
+                ELSEIF p_hasta IS NOT NULL THEN
+                    EXECUTE stmt USING @hasta;
+                ELSEIF p_min_total IS NOT NULL THEN
+                    EXECUTE stmt USING @min_total;
+                ELSE
+                    EXECUTE stmt;
+                END IF;
+
                 DEALLOCATE PREPARE stmt;
             END
         ");

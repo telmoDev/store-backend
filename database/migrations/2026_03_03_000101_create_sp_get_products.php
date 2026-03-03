@@ -21,9 +21,11 @@ return new class extends Migration
             )
             BEGIN
                 SET @query = 'SELECT * FROM products WHERE 1=1';
+                SET @search = NULL;
                 
                 IF p_search IS NOT NULL AND p_search != '' THEN
-                    SET @query = CONCAT(@query, ' AND (name LIKE ''%', p_search, '%'' OR sku LIKE ''%', p_search, '%'' )');
+                    SET @query = CONCAT(@query, ' AND (name LIKE ? OR sku LIKE ? )');
+                    SET @search = CONCAT('%', p_search, '%');
                 END IF;
 
                 IF p_sort_field IS NOT NULL AND p_sort_field != '' THEN
@@ -35,7 +37,13 @@ return new class extends Migration
                 SET @query = CONCAT(@query, ' LIMIT ', p_limit, ' OFFSET ', p_offset);
 
                 PREPARE stmt FROM @query;
-                EXECUTE stmt;
+                
+                IF @search IS NOT NULL THEN
+                    EXECUTE stmt USING @search, @search;
+                ELSE
+                    EXECUTE stmt;
+                END IF;
+                
                 DEALLOCATE PREPARE stmt;
             END
         ");
