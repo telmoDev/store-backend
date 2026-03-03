@@ -1,0 +1,43 @@
+@baseUrl = http://localhost/api
+
+### Listar Productos (Paginado y Búsqueda)
+GET {{baseUrl}}/productos?search=Laptop&page=1&per_page=5
+Accept: application/json
+
+### Listar Pedidos (Todos)
+GET {{baseUrl}}/pedidos
+Accept: application/json
+
+### Listar Pedidos con Filtros (Desde/Hasta/Monto Mínimo)
+GET {{baseUrl}}/pedidos?desde=2026-03-01&hasta=2026-03-31&minTotal=100
+Accept: application/json
+
+### Crear un Nuevo Pedido (Exitoso)
+POST {{baseUrl}}/pedidos
+Content-Type: application/json
+Accept: application/json
+
+{
+    "customer_name": "Telmo Dev",
+    "customer_email": "telmo@example.com",
+    "customer_phone": "0987654321",
+    "customer_address": "Av. Principal 123",
+    "products": [
+        {
+            "product_id": 1,
+            "quantity": 2
+        },
+        {
+            "product_id": 2,
+            "quantity": 1
+        }
+    ]
+}
+
+### Ver un Pedido Específico
+GET {{baseUrl}}/pedidos/1
+Accept: application/json
+
+### Eliminar un Pedido
+DELETE {{baseUrl}}/pedidos/1
+Accept: application/json
