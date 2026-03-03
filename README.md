@@ -63,16 +63,19 @@ Sigue estos pasos para configurar el proyecto localmente:
 ### Productos
 -   `GET /api/productos`: Lista paginada de productos con búsqueda por nombre/SKU.
 
-## Pruebas
+## Recursos Adicionales
 
-El proyecto cuenta con pruebas automatizadas para validar la lógica de los servicios y los SPs.
+### Exportación SQL (Standalone)
+Si deseas reconstruir la base de datos sin depender de las migraciones de Laravel, puedes usar estos archivos en orden:
+1.  [schema.sql](file:///Users/telmo/projects/laravel/store/schema.sql): Crea las tablas y llaves foráneas.
+2.  [procedures.sql](file:///Users/telmo/projects/laravel/store/procedures.sql): Instala todos los procedimientos almacenados (versión segura).
+3.  [seed.sql](file:///Users/telmo/projects/laravel/store/seed.sql): Pobla la tabla de productos con datos iniciales.
 
-```bash
-./vendor/bin/sail artisan test
-```
+### Pruebas de API
+-   [api.http](file:///Users/telmo/projects/laravel/store/api.http): Archivo con ejemplos de peticiones HTTP para probar los endpoints directamente desde VS Code (usando REST Client) o cualquier herramienta compatible.
 
 ## Arquitectura
-
 -   **Migrations**: Cada procedimiento almacenado tiene su propio archivo de migración en `database/migrations/` para facilitar su mantenimiento.
 -   **Services**: Los servicios actúan como puentes, llamando a los SPs mediante `DB::select` o `DB::statement`.
 -   **Controllers**: Manejan la entrada del usuario y devuelven respuestas mediante `JsonResources`.
+-   **Decisiones Técnicas**: Consulta [TECH_NOTES.md](file:///Users/telmo/projects/laravel/store/TECH_NOTES.md) para más detalles.
